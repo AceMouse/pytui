@@ -49,8 +49,14 @@ class Tui:
             t_len = max_len - len(post)
             trunkated = text[:t_len] + post 
         padding = ' '*(max_len-len(trunkated))
+        old_buf = self._buf
+        set_buffered(True)
         for i,text in enumerate(self._split_text_every_nth(trunkated + padding, width)): 
             self._place_text(text, col, row+i)
+        if not old_buf:
+            self.flush()
+        set_buffered(old_buf)
+
                 
     def flush(self):
         sys.stdout.write(''.join(self._queue))
