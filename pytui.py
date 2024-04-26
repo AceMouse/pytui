@@ -53,7 +53,8 @@ class Tui:
             self._place_text(text, col, row+i)
                 
     def flush(self):
-        print(''.join(self._queue), flush=True)
+        sys.stdout.write(''.join(self._queue))
+        sys.stdout.flush()
         _queue = []
 
     def clear(self):
@@ -62,7 +63,8 @@ class Tui:
             self.flush()
 
     def hide_cursor(self, hide:bool):
-        print(f"{self._CMD}?25l" if hide else f"{self._CMD}?25h", flush = True)
+        sys.stdout.write(f"{self._CMD}?25l" if hide else f"{self._CMD}?25h")
+        sys.stdout.flush()
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True):
         self._buf = buffered
