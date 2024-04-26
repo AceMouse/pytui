@@ -61,26 +61,30 @@ class Tui:
         if not self._buf:
             self.flush()
 
-    def test(self):
-        import time 
-        self.clear()
-        self.place_text("1234567", 3, 3, width = 3, height = 1)
-        time.sleep(1)
-        self.set_buffered(True)
-        self.place_text("1234567890123456789", 3, 3, width = 15, height = 1)
-        time.sleep(1)
-        self.place_text("123", 3, 3, width = 10, height = 1)
-        self.flush()
-        self.set_buffered(False)
-        self.place_text("1234567890123456789", 4, 4, width = 2)
-        self.place_text("1234567890123456789", 7, 7, width = 3, height = 3)
+    def hide_cursor(hide:bool):
+        print(f"{self._CMD}?25h" if hide else f"{self._CMD}?25l", flush = True)
 
-    def __init__(self,buffered = False):
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True):
         self._buf = buffered
         self._queue = []
         self._CMD = '\033['
+        self.hide_cursor(hide_cursor)
 
+
+def test():
+    import time 
+    tui = Tui()
+    tui.clear()
+    tui.place_text("1234567", 3, 3, width = 3, height = 1)
+    time.sleep(1)
+    tui.set_buffered(True)
+    tui.place_text("1234567890123456789", 3, 3, width = 15, height = 1)
+    time.sleep(1)
+    tui.place_text("123", 3, 3, width = 10, height = 1)
+    tui.flush()
+    tui.set_buffered(False)
+    tui.place_text("1234567890123456789", 4, 4, width = 2)
+    tui.place_text("1234567890123456789", 7, 7, width = 3, height = 3)
 
 if __name__ == "__main__":
-    t = Tui()
-    t.test()
+    test()
