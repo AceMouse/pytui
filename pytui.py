@@ -13,6 +13,9 @@ class Tui:
         ret = []
         t_cols, _ = os.get_terminal_size()
         while text != "":
+            if len(text) < n:
+                ret += [text]
+                return ret
             idx = text.find(ch)
             if idx == -1:
                 if allow_overflow:
@@ -20,7 +23,7 @@ class Tui:
                 else:
                     ret += _split_text_every_nth(text, n)
                 return ret 
-            idx = text.rfind(ch,0,max(n,idx))
+            idx = text.rfind(ch,0,max(n,idx+1))
             if not allow_overflow:
                 idx = min(n, idx)
             else:
@@ -29,7 +32,7 @@ class Tui:
             if idx < n:
                 cut += (n-idx)*' '
             ret += [cut]
-            text = text[idx:]
+            text = text[idx+1:]
         return ret 
 
     def _correct_wh(self, col, row, width, height):
@@ -117,6 +120,12 @@ def test():
     tui.set_buffered(False)
     tui.place_text("1234567890123456789", 4, 4, width = 2)
     tui.place_text("1234567890123456789", 7, 7, width = 3, height = 3)
+    time.sleep(1)
+    tui.clear()
+    [print(x) for x in tui._split_text_before_every_nth("123 567 9", 6, allow_overflow=True)]
+    [print(x) for x in tui._split_text_before_every_nth("123567 9", 6, allow_overflow=True)]
+    [print(x) for x in tui._split_text_before_every_nth("1235679", 6, allow_overflow=True)]
+    [print(x) for x in tui._split_text_before_every_nth("12234566667 12227011 4 17098 01479 047189 704911704 87 01842 70481 70431", 6, allow_overflow=True)]
 
 if __name__ == "__main__":
     test()
