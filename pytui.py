@@ -24,7 +24,7 @@ class Tui:
         col += 1
         row += 1
         for i in range(height):
-            self._place_text(' '*width, col, row+1)
+            self._place_text(' '*width, col, row+i)
 
     def set_buffered(self, buffered:bool):
         self._buf = buffered
