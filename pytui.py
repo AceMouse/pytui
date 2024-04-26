@@ -1,4 +1,5 @@
 import os
+import sys
 class Tui:
     def _place_text(self, text:str, col:int, row:int):
         self._queue += [f"{self._CMD}{row};{col}H{text}"]
