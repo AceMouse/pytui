@@ -14,7 +14,7 @@ class Tui:
         t_cols, _ = os.get_terminal_size()
         while text != "":
             idx = text.find(ch)
-            if idx = -1:
+            if idx == -1:
                 if allow_overflow:
                     ret += [text]
                 else:
