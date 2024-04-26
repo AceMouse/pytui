@@ -9,6 +9,29 @@ class Tui:
     def _split_text_every_nth(self, text:str, n:int) -> list[str]:
         return [text[i:i+n] for i in range(0, len(text), n)]
 
+    def _split_text_before_every_nth(self, text:str, n:int, ch:str = " ", allow_overflow:bool = True) -> list[str]:
+        ret = []
+        t_cols, _ = os.get_terminal_size()
+        while text != "":
+            idx = text.find(ch)
+            if idx = -1:
+                if allow_overflow:
+                    ret += [text]
+                else:
+                    ret += _split_text_every_nth(text, n)
+                return ret 
+            idx = text.rfind(ch,0,max(n,idx))
+            if not allow_overflow:
+                idx = min(n, idx)
+            else:
+                idx = min(t_cols, idx)
+            cut = text[:idx]
+            if idx < n:
+                cut += (n-idx)*' '
+            ret += [cut]
+            text = text[idx:]
+        return ret 
+
     def _correct_wh(self, col, row, width, height):
         t_cols, t_rows = os.get_terminal_size()
         width = min(width, t_cols-col)
@@ -41,7 +64,7 @@ class Tui:
         col += 1
         row += 1
         max_len = width*height
-        trunkated = text 
+        trunkated = ''.join(self._split_text_before_every_nth(text, width, allow_overflow=True)) 
         if len(text)>max_len:
             post = ''
             if max_len >= 10:
@@ -51,7 +74,8 @@ class Tui:
         padding = ' '*(max_len-len(trunkated))
         old_buf = self._buf
         self.set_buffered(True)
-        for i,text in enumerate(self._split_text_every_nth(trunkated + padding, width)): 
+#        for i,text in enumerate(self._split_text_every_nth(trunkated + padding, width)): 
+        for i,text in enumerate(self._split_text_before_every_nth(trunkated + padding, width, allow_overflow=True)): 
             self._place_text(text, col, row+i)
         if not old_buf:
             self.flush()
