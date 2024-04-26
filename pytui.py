@@ -15,7 +15,7 @@ class Tui:
         height = min(height, t_rows-row)
         return width, height
 
-    def clear_box(self, col:int, row:int, width:int = 10000, height: int = 10000):
+    def clear_box(self, col:int = 0, row:int = 0, width:int = 10000, height: int = 10000):
         if width == 0 or height == 0:
             return
         width, height = self._correct_wh(col, row, width, height)
@@ -40,7 +40,6 @@ class Tui:
             return
         col += 1
         row += 1
-        max_len = -1
         max_len = width*height
         trunkated = text 
         if len(text)>max_len:
