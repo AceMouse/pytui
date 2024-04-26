@@ -61,7 +61,7 @@ class Tui:
         if not self._buf:
             self.flush()
 
-    def hide_cursor(hide:bool):
+    def hide_cursor(self, hide:bool):
         print(f"{self._CMD}?25h" if hide else f"{self._CMD}?25l", flush = True)
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True):
