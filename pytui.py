@@ -55,7 +55,7 @@ class Tui:
             self._place_text(text, col, row+i)
         if not old_buf:
             self.flush()
-        set_buffered(old_buf)
+        self.set_buffered(old_buf)
 
                 
     def flush(self):
