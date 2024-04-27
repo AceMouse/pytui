@@ -1,10 +1,12 @@
 import os
 import sys
 class Tui:
+    def _b_place_cursor(self, col:int, row:int):
+        self._queue += [f"{self._CMD}{row};{col}H"]
+
     def _place_text(self, text:str, col:int, row:int):
-        self._queue += [f"{self._CMD}{row};{col}H{text}"]
-        if not self._buf:
-            self.flush()
+        self._b_move_cursor(col, row)
+        self._queue += [text]
 
     def _split_text_every_nth(self, text:str, n:int) -> list[str]:
         return [text[i:i+n] for i in range(0, len(text), n)]
@@ -51,12 +53,14 @@ class Tui:
         row += 1
         for i in range(height):
             self._place_text(' '*width, col, row+i)
+        self._flush()
 
     def set_buffered(self, buffered:bool):
         self._buf = buffered
 
     def clear_line(self, col:int = 0, row:int = 0):
         self._place_text(f"{self._CMD}0K", col+1, row+1)
+        self._flush()
 
     def place_text(self, text:str, col:int = 0, row:int = 0, width:int = 10000, height:int = 10000):
         if width == 0 or height == 0:
@@ -75,29 +79,33 @@ class Tui:
             t_len = max_len - len(post)
             trunkated = text[:t_len] + post 
         padding = ' '*(max_len-len(trunkated))
-        old_buf = self._buf
-        self.set_buffered(True)
-#        for i,text in enumerate(self._split_text_every_nth(trunkated + padding, width)): 
         for i,text in enumerate(self._split_text_before_every_nth(trunkated + padding, width, allow_overflow=True)): 
             self._place_text(text, col, row+i)
-        if not old_buf:
-            self.flush()
-        self.set_buffered(old_buf)
+        self._flush()
 
-                
+    def place_cursor(self, col:int=0, row:int=0):
+        col, row = self._correct_wh(0,0,col,row)
+        self._b_move_cursor(col+1, row+1) 
+        self._flush()
+
+    def _flush(self, do:union[bool,None]=None):
+        if do is None:
+            do = not self._buf
+        if do:
+            sys.stdout.write(''.join(self._queue))
+            sys.stdout.flush()
+            _queue = []
+
     def flush(self):
-        sys.stdout.write(''.join(self._queue))
-        sys.stdout.flush()
-        _queue = []
+        self._flush(True)
 
     def clear(self):
         self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
-        if not self._buf:
-            self.flush()
+        self._flush()
 
     def hide_cursor(self, hide:bool):
-        sys.stdout.write(f"{self._CMD}?25l" if hide else f"{self._CMD}?25h")
-        sys.stdout.flush()
+        self._queue = [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
+        self._flush()
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True):
         self._buf = buffered
