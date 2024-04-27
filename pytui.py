@@ -88,10 +88,8 @@ class Tui:
         self._b_move_cursor(col+1, row+1) 
         self._flush()
 
-    def _flush(self, do:union[bool,None]=None):
-        if do is None:
-            do = not self._buf
-        if do:
+    def _flush(self, force:bool=False): 
+        if force or not self._buf:
             sys.stdout.write(''.join(self._queue))
             sys.stdout.flush()
             _queue = []
