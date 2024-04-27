@@ -5,7 +5,7 @@ class Tui:
         self._queue += [f"{self._CMD}{row};{col}H"]
 
     def _place_text(self, text:str, col:int, row:int):
-        self._b_move_cursor(col, row)
+        self._b_place_cursor(col, row)
         self._queue += [text]
 
     def _split_text_every_nth(self, text:str, n:int) -> list[str]:
@@ -85,7 +85,7 @@ class Tui:
 
     def place_cursor(self, col:int=0, row:int=0):
         col, row = self._correct_wh(0,0,col,row)
-        self._b_move_cursor(col+1, row+1) 
+        self._b_place_cursor(col+1, row+1) 
         self._flush()
 
     def _flush(self, force:bool=False): 
