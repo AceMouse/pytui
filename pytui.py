@@ -2,7 +2,7 @@ import os
 import sys
 class Tui:
     def _b_place_cursor(self, col:int, row:int):
-        self._queue += [f"{self._CMD}{row};{col}H"]
+        self._queue += [f"{self._CMD}{row+self._row_off};{col+self._col_off}H"]
 
     def _place_text(self, text:str, col:int, row:int):
         self._b_place_cursor(col, row)
@@ -97,6 +97,11 @@ class Tui:
     def flush(self):
         self._flush(True)
 
+    def set_offset(col_offset=0, row_offset=0):
+        self._col_off = col_offset
+        self._row_off = row_offset
+
+
     def clear(self):
         self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
         self._flush()
@@ -105,10 +110,11 @@ class Tui:
         self._queue += [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
         self._flush()
 
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True):
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0):
         self._buf = buffered
         self._queue = []
         self._CMD = '\033['
+        self.set_offset(col_offset, row_offset)
         self.hide_cursor(hide_cursor)
 
 
