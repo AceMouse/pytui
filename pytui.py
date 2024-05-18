@@ -109,6 +109,12 @@ class Tui:
         self._queue += [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
         self._flush()
 
+    def set_max_width(width):
+        self.max_width = max_width
+
+    def set_max_height(height):
+        self.max_height = max_height
+
     def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000):
         self._buf = buffered
         self.max_width = max_width
