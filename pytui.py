@@ -92,9 +92,11 @@ class Tui:
         if force or (not self._buf):
             sys.stdout.write(''.join(self._queue))
             sys.stdout.flush()
-            _queue = []
+            self._queue = []
 
     def flush(self):
+        print("q:,self._queue)
+        print("buf:", self._buf)
         self._flush(force = True)
 
     def clear(self):
