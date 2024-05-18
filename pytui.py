@@ -39,8 +39,8 @@ class Tui:
 
     def _correct_wh(self, col, row, width, height):
         t_cols, t_rows = os.get_terminal_size()
-        width = min(width, t_cols-col)
-        height = min(height, t_rows-row)
+        width = min(width, t_cols-(col+col_offset))
+        height = min(height, t_rows-(row+row_offset))
         return width, height
 
     def clear_box(self, col:int = 0, row:int = 0, width:int = 10000, height: int = 10000):
@@ -100,7 +100,6 @@ class Tui:
     def set_offset(col_offset=0, row_offset=0):
         self._col_off = col_offset
         self._row_off = row_offset
-
 
     def clear(self):
         self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
