@@ -95,16 +95,14 @@ class Tui:
             self._queue = []
 
     def flush(self):
-        print("q:",self._queue)
-        print("buf:", self._buf)
-        self._flush(force = True)
+        self._flush(True)
 
     def clear(self):
         self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
         self._flush()
 
     def hide_cursor(self, hide:bool):
-        self._queue = [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
+        self._queue = +=[f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
         self._flush()
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True):
