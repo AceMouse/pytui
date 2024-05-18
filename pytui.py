@@ -89,13 +89,13 @@ class Tui:
         self._flush()
 
     def _flush(self, force:bool=False): 
-        if force or not self._buf:
+        if force or (not self._buf):
             sys.stdout.write(''.join(self._queue))
             sys.stdout.flush()
             _queue = []
 
     def flush(self):
-        self._flush(True)
+        self._flush(force = True)
 
     def clear(self):
         self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
