@@ -95,7 +95,7 @@ class Tui:
             self._queue = []
 
     def flush(self):
-        print("q:,self._queue)
+        print("q:",self._queue)
         print("buf:", self._buf)
         self._flush(force = True)
 
