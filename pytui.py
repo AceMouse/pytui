@@ -97,7 +97,7 @@ class Tui:
     def flush(self):
         self._flush(True)
 
-    def set_offset(col_offset=0, row_offset=0):
+    def set_offset(self, col_offset=0, row_offset=0):
         self._col_off = col_offset
         self._row_off = row_offset
 
