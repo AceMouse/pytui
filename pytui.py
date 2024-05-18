@@ -102,7 +102,7 @@ class Tui:
         self._flush()
 
     def hide_cursor(self, hide:bool):
-        self._queue = +=[f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
+        self._queue += [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
         self._flush()
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True):
