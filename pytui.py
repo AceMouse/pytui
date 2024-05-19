@@ -101,7 +101,7 @@ class Tui:
         self._flush(True)
 
     def clear(self):
-        clear_box(0,0)
+        self.clear_box(0,0)
         self._flush()
 
     def hide_cursor(self, hide:bool):
