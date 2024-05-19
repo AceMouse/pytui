@@ -110,10 +110,10 @@ class Tui:
         self._flush()
 
     def set_max_width(self,width):
-        self.max_width = max_width
+        self.max_width = width
 
     def set_max_height(self,height):
-        self.max_height = max_height
+        self.max_height = height
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000):
         self._buf = buffered
