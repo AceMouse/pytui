@@ -2,10 +2,10 @@ import os
 import sys
 class Tui:
     def _b_place_cursor(self, col:int, row:int):
-        self._place_cursor_abs(col+self._col_offset, row+self._row_offset)
+        self._place_cursor_abs(col+self.col_offset, row+self.row_offset)
 
     def _place_cursor_abs(self, col:int, row:int):
-        self._queue += [f"{self._CMD}{row};{col}H"]
+        self._queue += [f"{self._CSI}{row};{col}H"]
 
     def _place_text(self, text:str, col:int, row:int):
         self._b_place_cursor(col, row)
@@ -40,16 +40,16 @@ class Tui:
             text = text[idx+1:]
         return ret 
 
-    def _correct_wh(self, col, row, width, height):
+    def _correct_dims(self, col, row, width, height):
         t_cols, t_rows = os.get_terminal_size()
-        width  = min(width,  t_cols-(col+self._col_offset),self.max_width -(col+self._col_offset))
-        height = min(height, t_rows-(row+self._row_offset),self.max_height-(row+self._row_offset))
+        width  = min(width,  t_cols-(col+self.col_offset),self.max_width -(col+self.col_offset))
+        height = min(height, t_rows-(row+self.row_offset),self.max_height-(row+self.row_offset))
         return width, height
 
     def clear_box(self, col:int = 0, row:int = 0, width:int = 10000, height: int = 10000):
         if width == 0 or height == 0:
             return
-        width, height = self._correct_wh(col, row, width, height)
+        width, height = self._correct_dims(col, row, width, height)
         if width <= 0 or height <= 0:
             return
         col += 1
@@ -58,17 +58,14 @@ class Tui:
             self._place_text(' '*width, col, row+i)
         self._flush()
 
-    def set_buffered(self, buffered:bool):
-        self._buf = buffered
-
     def clear_line(self, col:int = 0, row:int = 0):
-        self._place_text(f"{self._CMD}0K", col+1, row+1)
+        self._place_text(f"{self._CSI}0K", col+1, row+1)
         self._flush()
 
     def place_text(self, text:str, col:int = 0, row:int = 0, width:int = 10000, height:int = 10000):
         if width == 0 or height == 0:
             return
-        width, height = self._correct_wh(col, row, width, height)
+        width, height = self._correct_dims(col, row, width, height)
         if width <= 0 or height <= 0:
             return
         col += 1
@@ -87,14 +84,15 @@ class Tui:
         self._flush()
 
     def place_cursor(self, col:int=0, row:int=0):
-        col, row = self._correct_wh(0,0,col,row)
+        col, row = self._correct_dims(0,0,col,row)
         self._b_place_cursor(col+1, row+1) 
         self._flush()
 
     def _flush(self, force:bool=False): 
-        if force or (not self._buf):
-            if self.default_cursor_pos is not None:
-                self._place_cursor_abs(*self.default_cursor_pos)
+        if force or (not self.buffered):
+            if self.return_on_flush:
+                self._queue = [f"{self._CSI}s"] + self._queue + [f"{self._CSI}u"]
+
             sys.stdout.write(''.join(self._queue))
             sys.stdout.flush()
             self._queue = []
@@ -102,32 +100,25 @@ class Tui:
     def flush(self):
         self._flush(True)
 
-    def set_offset(self, col_offset=0, row_offset=0):
-        self._col_offset = col_offset
-        self._row_offset = row_offset
-
     def clear(self):
-        self._queue = [f"{self._CMD}1;1H{self._CMD}0J"]
+        self._queue = [f"{self._CSI}1;1H{self._CSI}0J"]
         self._flush()
 
     def hide_cursor(self, hide:bool):
-        self._queue += [f"{self._CMD}?25l" if hide else f"{self._CMD}?25h"]
+        self._queue += [f"{self._CSI}?25l" if hide else f"{self._CSI}?25h"]
         self._flush()
 
-    def set_max_width(self,width):
-        self.max_width = width
-
-    def set_max_height(self,height):
-        self.max_height = height
-
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None):
-        self._buf = buffered
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True):
+        self.buffered = buffered
         self.max_width = max_width
         self.max_height = max_height
         self._queue = []
-        self._CMD = '\033['
-        self.default_cursor_pos = default_cursor_pos
-        self.set_offset(col_offset, row_offset)
+        self._CSI = '\033['
+        self.return_on_flush = return_on_flush
+        if default_cursor_pos is not None:
+            self._place_cursor_abs(*default_cursor_pos)
+        self.col_offset = col_offset
+        self.row_offset = row_offset
         self.hide_cursor(hide_cursor)
 
 
@@ -137,12 +128,12 @@ def test():
     tui.clear()
     tui.place_text("1234567", 3, 3, width = 3, height = 1)
     time.sleep(1)
-    tui.set_buffered(True)
+    tui.buffered = True 
     tui.place_text("1234567890123456789", 3, 3, width = 15, height = 1)
     time.sleep(1)
     tui.place_text("123", 3, 3, width = 10, height = 1)
     tui.flush()
-    tui.set_buffered(False)
+    tui.buffered = False
     tui.place_text("1234567890123456789", 4, 4, width = 2)
     tui.place_text("1234567890123456789", 7, 7, width = 3, height = 3)
     time.sleep(1)
