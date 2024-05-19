@@ -109,16 +109,18 @@ class Tui:
         self._flush()
 
     def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True):
+        self._queue = []
+        self._CSI = '\033['
         self.buffered = buffered
         self.max_width = max_width
         self.max_height = max_height
-        self._queue = []
-        self._CSI = '\033['
-        self.return_on_flush = return_on_flush
-        if default_cursor_pos is not None:
-            self._place_cursor_abs(*default_cursor_pos)
         self.col_offset = col_offset
         self.row_offset = row_offset
+        if default_cursor_pos is not None:
+            self.return_on_flush = False
+            self._place_cursor_abs(*default_cursor_pos)
+            self.flush()
+        self.return_on_flush = return_on_flush
         self.hide_cursor(hide_cursor)
 
 
