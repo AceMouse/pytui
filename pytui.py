@@ -90,6 +90,8 @@ class Tui:
 
     def _flush(self, force:bool=False): 
         if force or (not self._buf):
+            if self.default_cursor_pos is not None:
+                self._b_place_cursor(*self.default_cursor_pos)
             sys.stdout.write(''.join(self._queue))
             sys.stdout.flush()
             self._queue = []
@@ -115,12 +117,13 @@ class Tui:
     def set_max_height(self,height):
         self.max_height = height
 
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000):
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None):
         self._buf = buffered
         self.max_width = max_width
         self.max_height = max_height
         self._queue = []
         self._CMD = '\033['
+        self.default_cursor_pos = default_cursor_pos
         self.set_offset(col_offset, row_offset)
         self.hide_cursor(hide_cursor)
 
