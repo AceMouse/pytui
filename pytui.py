@@ -59,7 +59,7 @@ class Tui:
         self._flush()
 
     def clear_line(self, col:int = 0, row:int = 0):
-        self._place_text(f"{self._CSI}0K", col+1, row+1)
+        self.clear_box(col, row, height=1)
         self._flush()
 
     def place_text(self, text:str, col:int = 0, row:int = 0, width:int = 10000, height:int = 10000):
@@ -101,7 +101,7 @@ class Tui:
         self._flush(True)
 
     def clear(self):
-        self._queue = [f"{self._CSI}1;1H{self._CSI}0J"]
+        clear_box(0,0)
         self._flush()
 
     def hide_cursor(self, hide:bool):
