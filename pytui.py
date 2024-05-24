@@ -128,8 +128,6 @@ class Tui:
         self.hide_cursor(hide_cursor)
         if len(border) > 0:
             self.clear_box(char=border)
-            self.max_width -=1
-            self.max_height -=1
             self.col_offset +=1 
             self.row_offset +=1
             self.max_width -=2
