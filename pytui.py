@@ -46,7 +46,13 @@ class Tui:
         height = min(height, t_rows-(row+self.row_offset),self.max_height-(row+self.row_offset))
         return width, height
 
-    def clear_box(self, col:int = 0, row:int = 0, width:int = 10000, height: int = 10000):
+    def _clear_box(self, col, row, width, height, char):
+        for i in range(height):
+            self._place_text(char*width, col, row+i)
+        self._flush()
+
+
+    def clear_box(self, col:int = 0, row:int = 0, width:int = 10000, height: int = 10000, char=' '):
         if width == 0 or height == 0:
             return
         width, height = self._correct_dims(col, row, width, height)
@@ -54,9 +60,7 @@ class Tui:
             return
         col += 1
         row += 1
-        for i in range(height):
-            self._place_text(' '*width, col, row+i)
-        self._flush()
+        self._clear_box(col,row,width,height,char)
 
     def clear_line(self, col:int = 0, row:int = 0):
         self.clear_box(col, row, height=1)
@@ -108,7 +112,7 @@ class Tui:
         self._queue += [f"{self._CSI}?25l" if hide else f"{self._CSI}?25h"]
         self._flush()
 
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True):
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True, border = '#'):
         self._queue = []
         self._CSI = '\033['
         self.buffered = buffered
@@ -122,6 +126,15 @@ class Tui:
             self.flush()
         self.return_on_flush = return_on_flush
         self.hide_cursor(hide_cursor)
+        if len(border) > 0:
+            self.clear_box(char=border)
+            self.max_width -=1
+            self.max_height -=1
+            self.col_offset +=1 
+            self.row_offset +=1
+            self.clear_box(char=' ')
+
+        
 
 
 def test():
