@@ -26,7 +26,7 @@ class Tui:
                 if allow_overflow:
                     ret += [text]
                 else:
-                    ret += _split_text_every_nth(text, n)
+                    ret += self._split_text_every_nth(text, n)
                 return ret 
             idx = text.rfind(ch,0,max(n,idx+1))
             if not allow_overflow:
@@ -116,10 +116,10 @@ class Tui:
         self._queue = []
         self._CSI = '\033['
         self.buffered = buffered
-        self.max_width = max_width
-        self.max_height = max_height
         self.col_offset = col_offset
         self.row_offset = row_offset
+        self.max_width = max_width + col_offset
+        self.max_height = max_height + row_offset
         if default_cursor_pos is not None:
             self.return_on_flush = False
             self._place_cursor_abs(*default_cursor_pos)
@@ -132,6 +132,8 @@ class Tui:
             self.max_height -=1
             self.col_offset +=1 
             self.row_offset +=1
+            self.max_width -=2
+            self.max_height -=2
             self.clear_box(char=' ')
 
         
