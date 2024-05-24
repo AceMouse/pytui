@@ -112,7 +112,7 @@ class Tui:
         self._queue += [f"{self._CSI}?25l" if hide else f"{self._CSI}?25h"]
         self._flush()
 
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True, border = '#'):
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True, border = ''):
         self._queue = []
         self._CSI = '\033['
         self.buffered = buffered
