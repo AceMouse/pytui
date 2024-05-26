@@ -42,8 +42,8 @@ class Tui:
 
     def _correct_dims(self, col, row, width, height):
         t_cols, t_rows = os.get_terminal_size()
-        width  = min(width,  t_cols-(col+self.col_offset),self.max_width -(col+self.col_offset))
-        height = min(height, t_rows-(row+self.row_offset),self.max_height-(row+self.row_offset))
+        width  = min(width,  min(t_cols,self.max_width) -col-self.col_offset)
+        height = min(height, min(t_rows,self.max_height)-row-self.row_offset)
         return width, height
 
     def _clear_box(self, col, row, width, height, char):
@@ -58,7 +58,7 @@ class Tui:
         width, height = self._correct_dims(col, row, width, height)
         if width <= 0 or height <= 0:
             return
-        col += 1
+        col += 1 
         row += 1
         self._clear_box(col,row,width,height,char)
 
@@ -94,6 +94,7 @@ class Tui:
 
     def _flush(self, force:bool=False): 
         if force or (not self.buffered):
+            self._queue = [self.colour] + self._queue
             if self.return_on_flush:
                 self._queue = [f"{self._CSI}s"] + self._queue + [f"{self._CSI}u"]
 
@@ -112,7 +113,11 @@ class Tui:
         self._queue += [f"{self._CSI}?25l" if hide else f"{self._CSI}?25h"]
         self._flush()
 
-    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True, border = ''):
+    def get_colour(self,bgr,bgg,bgb,tr,tg,tb):
+        return f"{self._CSI}48;2;{bgr};{bgg};{bgb}m{self._CSI}38;2;{tr};{tg};{tb}m"
+
+
+    def __init__(self,buffered:bool = False, hide_cursor:bool = True, col_offset=0, row_offset=0, max_width=10000, max_height=10000, default_cursor_pos=None, return_on_flush=True, border = '', t_colour =(255,255,255), bg_colour=(0,0,0)):
         self._queue = []
         self._CSI = '\033['
         self.buffered = buffered
@@ -120,11 +125,14 @@ class Tui:
         self.row_offset = row_offset
         self.max_width = max_width + col_offset
         self.max_height = max_height + row_offset
+        self.colour = self.get_colour(*bg_colour,*t_colour)
+
         if default_cursor_pos is not None:
             self.return_on_flush = False
             self._place_cursor_abs(*default_cursor_pos)
             self.flush()
         self.return_on_flush = return_on_flush
+
         self.hide_cursor(hide_cursor)
         if len(border) > 0:
             self.clear_box(char=border)
